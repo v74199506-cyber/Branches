@@ -68,7 +68,8 @@ The tests cover seed capture and restoration, version diffs, branch geometry, gr
 
 ## License
 
-No license has been declared yet. Add a license file before distributing or accepting external contributions.
+Branches is released under the [MIT License](LICENSE). You are free to use,
+modify, and redistribute the extension under the terms of that license.
 
 ## Release
 
