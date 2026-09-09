@@ -30,6 +30,12 @@ Branches records image-generation experiments in a visual, persistent history. E
 
 The extension has no additional Python or JavaScript dependencies.
 
+### Windows one-click installer
+
+Download the repository and double-click `install_branches.bat`. It attempts to
+detect a nearby ComfyUI folder; otherwise, enter the full path when prompted.
+Restart ComfyUI after installation completes.
+
 ## Usage
 
 Run a workflow normally. An accepted generation creates a history result. The configuration is captured at queue time, before randomized widgets can change, and completed outputs are associated with that result.
