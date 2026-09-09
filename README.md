@@ -1,44 +1,75 @@
-# Nox Trees para ComfyUI
+# Nox Branches
 
-Histórico de gerações em árvore, em um painel sobre a lateral direita. Extensão local, sem dependências adicionais e sem serviços externos.
+Branchable generation history for [ComfyUI](https://github.com/comfyanonymous/ComfyUI).
 
-## Instalação
+Nox Branches records image-generation experiments in a visual, persistent history. Each generation keeps its workflow, submitted parameters, seed, status, and available previews so you can return to a successful result and explore another path without losing earlier work.
 
-Copie `__init__.py` e a pasta `web` para `ComfyUI/custom_nodes/nox-generation-trees/`. Reinicie o ComfyUI e atualize a página. Clique em **🌿 Versões**, no canto superior direito.
+## Highlights
 
-## Uso
+- Visual version tree with explicit branches.
+- Separate history for different workflows.
+- Consecutive runs with the same configuration grouped into one version while every result remains selectable.
+- Per-result workflow, seed, status, and preview retention.
+- **Continue from here** to restore a result and create a new branch.
+- Seed choice when continuing: keep the original seed or generate a new one.
+- Side-by-side result comparison with parameter and prompt differences.
+- Full prompt diff for changed text fields.
+- Rename, favorite, expand, and collapse versions.
+- Save and restore trees through ComfyUI user-data storage.
+- JSON export and import for backups or moving a history to another instance.
+- Vertical right-sidebar layout or horizontal bottom-panel layout.
+- Theme-aware styling that follows ComfyUI colors.
+- Local-only operation with no analytics, telemetry, uploads, or external services.
 
-- A engrenagem **History settings** permite escolher **Vertical — right sidebar** ou **Horizontal — bottom panel**. A escolha é salva neste navegador.
-- No modo horizontal, o histórico aparece em um painel próprio sobre a parte inferior do canvas, com versões da esquerda para a direita. **Close** o recolhe; **Versions & history**, no canto inferior, o reabre. Esse painel não é uma aba do console de logs.
+## Installation
 
-### Atualização: resultados e workflows
+1. Copy this repository into `ComfyUI/custom_nodes/nox-generation-trees/`.
+2. Restart ComfyUI.
+3. Refresh the browser page.
+4. Open the **Versions** tab in the Workflow Overview panel.
 
-- Workflows com IDs diferentes passam a ter árvores independentes. Ao trocar de workflow, o painel procura sua árvore; a captura também verifica o ID antes de cada envio. Árvores antigas permanecem disponíveis em **Open**.
-- Runs consecutivos com a mesma configuração são agrupados na mesma versão, mesmo quando apenas as seeds numéricas mudam. O seletor **Result** permite escolher cada execução com sua seed, status, imagens e workflow próprios. Nenhum resultado é descartado.
-- **Continue from here** usa o resultado selecionado e inicia uma ramificação explícita, mesmo se a configuração não mudar. Alterações de prompt, LoRA ou outros parâmetros criam uma nova versão.
-- A comparação agora inclui o texto completo dos campos alterados em **Before / After**, destacando o trecho substituído. Não é apenas o resumo truncado.
-- O agrupamento vale para novas gerações. As versões antigas não são reorganizadas retroativamente.
+The extension has no additional Python or JavaScript dependencies.
 
-- Execute o workflow normalmente: cada envio aceito cria uma versão com o workflow, a configuração enviada e os previews. Edições sem geração não criam versões.
-- **Continuar daqui** restaura uma versão. A próxima geração será filha dela; voltar novamente ao mesmo ponto cria uma ramificação irmã.
-- Escolha **Manter seed fixa** ou **Usar seed aleatória**. A preferência pode ser lembrada por árvore e redefinida em **Opção de seed**.
-- **Salvar árvore** grava no computador. As gerações e alterações também são salvas automaticamente em `ComfyUI/user/default/nox-trees/` (ou no diretório do usuário ativo).
-- **Abrir** recupera árvores salvas; escolha uma versão e **Continuar daqui** para restaurar seu workflow.
-- **Exportar/Importar** transfere uma árvore em JSON, incluindo miniaturas incorporadas. Modelos, LoRAs, imagens de entrada e imagens originais não são incluídos; precisam continuar disponíveis para gerar ou abrir o resultado em resolução original.
-- Selecione **Comparar** em duas versões para ver previews lado a lado e diferenças. Também é possível renomear, favoritar e recolher ramos.
-- Antes de restaurar uma versão, a extensão guarda a edição atual. **Recuperar edição anterior** reabre essa cópia.
+## Usage
 
-## Limites desta versão
+Run a workflow normally. An accepted generation creates a history result. The configuration is captured at queue time, before randomized widgets can change, and completed outputs are associated with that result.
 
-- Fixação automática para widgets numéricos `seed` e `noise_seed`, com `control_after_generate`. Nós personalizados com controles próprios e seeds dentro de subgrafos podem exigir ajuste manual; seeds não encontradas geram aviso. Seeds fornecidas por conexões não são alteradas automaticamente.
-- O indicador de seed descreve a última restauração, não monitora alterações manuais posteriores nos widgets.
-- Use uma árvore em uma aba por vez para evitar gravações concorrentes. Ao reabrir a página ou outra árvore, clique em **Continuar daqui** antes de gerar a partir dela; sem isso a próxima geração inicia uma nova raiz.
-- Previews de saídas `images` são incorporados em JPEG com até 360 px; vídeos e outros tipos de saída não têm preview nesta versão.
-- O painel ocupa a área direita sobre o Workflow Overview; o botão **🌿 Versões** permite alternar entre os dois.
-- O histórico começa nas gerações feitas com a extensão carregada. O arquivo salvo não depende de manter o histórico do servidor, mas execuções pendentes precisam dele para recuperar resultados após fechar a página.
+Select **Continue from here** on any result to restore its workflow. If the prompt, LoRA, or another parameter is changed before the next run, the new result appears as a child version. Returning to an earlier result and running again creates a sibling branch. Repeated runs with the same non-seed configuration are grouped under one version; use the result selector to inspect or continue from a specific seed.
 
-## Verificação
+Use the gear button to choose the layout. In vertical mode, the tree lives in the right sidebar. In horizontal mode, it appears along the bottom of the canvas. The **Close** control hides the panel without changing the workflow.
 
-`node --test tests/core.test.mjs`
+Use **Save tree** for an explicit save. Trees are also saved automatically after relevant changes. **Open**, **Export**, and **Import** provide recovery and portability options.
 
-`tests/preview_server.py` é um proxy de desenvolvimento em `127.0.0.1:8190`, com ComfyUI em `127.0.0.1:8188`, para testar sem reiniciar o servidor. Não faz parte da instalação.
+## Seed behavior
+
+When continuing from a result, Nox Branches shows the seed actually submitted for that generation. You can keep it fixed for controlled prompt or LoRA comparisons, or choose a new random seed for exploration. The preference can be remembered per tree and reset through **Seed preference**.
+
+Automatic restoration supports numeric `seed` and `noise_seed` widgets and their standard `control_after_generate` controls. Custom nodes with private seed controls, connected seed inputs, or unsupported subgraphs may require manual adjustment; the panel reports seeds it could not restore.
+
+## Storage and privacy
+
+Tree files are stored through ComfyUI's local user-data mechanism. The extension does not send workflow data, prompts, images, telemetry, or identifiers to a remote service. Exported JSON files may contain prompts, model names, local filenames, and embedded preview thumbnails; handle exported files accordingly.
+
+## Current limitations
+
+- Preview thumbnails are generated for image outputs and stored at reduced size. Original output files remain managed by ComfyUI.
+- Video and non-image outputs do not receive embedded previews in this release.
+- Existing histories are preserved, but grouping applies to generations captured after this version is installed.
+- Use one active browser tab per tree when generating to avoid concurrent edits to the same JSON file.
+- Pending jobs can be reconciled after a page reload while their records remain available in ComfyUI history.
+
+## Development and verification
+
+```text
+node --test tests/core.test.mjs tests/integration.test.mjs
+```
+
+The tests cover seed capture and restoration, version diffs, branch geometry, grouped results, workflow isolation, prompt comparison, persistence validation, and queue integration.
+
+## License
+
+No license has been declared yet. Add a license file before distributing or accepting external contributions.
+
+## Release
+
+This repository contains the initial public release of Nox Branches. Feature behavior may evolve as ComfyUI's frontend APIs change.
