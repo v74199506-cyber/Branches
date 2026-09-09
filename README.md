@@ -1,8 +1,8 @@
-# Nox Branches
+#  Branches
 
 Branchable generation history for [ComfyUI](https://github.com/comfyanonymous/ComfyUI).
 
-Nox Branches records image-generation experiments in a visual, persistent history. Each generation keeps its workflow, submitted parameters, seed, status, and available previews so you can return to a successful result and explore another path without losing earlier work.
+Branches records image-generation experiments in a visual, persistent history. Each generation keeps its workflow, submitted parameters, seed, status, and available previews so you can return to a successful result and explore another path without losing earlier work.
 
 ## Highlights
 
@@ -23,7 +23,7 @@ Nox Branches records image-generation experiments in a visual, persistent histor
 
 ## Installation
 
-1. Copy this repository into `ComfyUI/custom_nodes/nox-generation-trees/`.
+1. Copy this repository into `ComfyUI/custom_nodes/generation-trees/`.
 2. Restart ComfyUI.
 3. Refresh the browser page.
 4. Open the **Versions** tab in the Workflow Overview panel.
@@ -42,7 +42,7 @@ Use **Save tree** for an explicit save. Trees are also saved automatically after
 
 ## Seed behavior
 
-When continuing from a result, Nox Branches shows the seed actually submitted for that generation. You can keep it fixed for controlled prompt or LoRA comparisons, or choose a new random seed for exploration. The preference can be remembered per tree and reset through **Seed preference**.
+When continuing from a result, Branches shows the seed actually submitted for that generation. You can keep it fixed for controlled prompt or LoRA comparisons, or choose a new random seed for exploration. The preference can be remembered per tree and reset through **Seed preference**.
 
 Automatic restoration supports numeric `seed` and `noise_seed` widgets and their standard `control_after_generate` controls. Custom nodes with private seed controls, connected seed inputs, or unsupported subgraphs may require manual adjustment; the panel reports seeds it could not restore.
 
@@ -72,4 +72,4 @@ No license has been declared yet. Add a license file before distributing or acce
 
 ## Release
 
-This repository contains the initial public release of Nox Branches. Feature behavior may evolve as ComfyUI's frontend APIs change.
+This repository contains the initial public release of Branches. Feature behavior may evolve as ComfyUI's frontend APIs change.
