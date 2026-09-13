@@ -10,6 +10,24 @@ export function configurationKey(prompt) {
   return JSON.stringify(normalize(prompt));
 }
 
+// Small wording experiments should stay together; creative changes start a new version.
+export function isMinorPromptEdit(before = {}, after = {}) {
+  const creative = /\b(pose|posing|angle|camera|view|outfit|clothes|clothing|dress|shirt|pants|armor|衣|服|姿勢)\b/i;
+  let changed = 0, words = 0;
+  for (const id of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    const a = before[id]?.inputs || {}, b = after[id]?.inputs || {};
+    for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) {
+      if (JSON.stringify(a[key]) === JSON.stringify(b[key])) continue;
+      if (typeof a[key] !== "string" || typeof b[key] !== "string") return false;
+      if (creative.test(`${a[key]} ${b[key]}`)) return false;
+      const oldWords = a[key].trim().split(/\s+/).filter(Boolean), newWords = b[key].trim().split(/\s+/).filter(Boolean);
+      words += Math.max(oldWords.length, newWords.length);
+      changed += oldWords.filter((word, i) => word !== newWords[i]).length + Math.abs(oldWords.length - newWords.length);
+    }
+  }
+  return changed > 0 && changed <= 4 && changed / Math.max(words, 1) <= 0.18;
+}
+
 export function changedText(before, after) {
   let start = 0, end = 0;
   while (start < before.length && start < after.length && before[start] === after[start]) start++;

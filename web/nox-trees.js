@@ -1,6 +1,6 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
-import { copy, newTree, differences, seeds, restoreSeeds, validateTree, branchLanes, configurationKey, groupedVersions, changedText } from "./tree-core.mjs";
+import { copy, newTree, differences, seeds, restoreSeeds, validateTree, branchLanes, configurationKey, groupedVersions, changedText, isMinorPromptEdit } from "./tree-core.mjs";
 
 const DIR = "nox-trees";
 const path = (tree) => `${DIR}/${tree.id}.json`;
@@ -498,7 +498,7 @@ app.registerExtension({
       if (response.prompt_id) {
         node.branchStart = !!parent && origin?.treeId === target.id && origin.parent === parent;
         const previous = target.nodes.find(n => n.id === parent);
-        if (!node.branchStart && previous && configurationKey(previous.prompt) === configurationKey(node.prompt)) {
+        if (!node.branchStart && previous && (configurationKey(previous.prompt) === configurationKey(node.prompt) || isMinorPromptEdit(previous.prompt, node.prompt))) {
           node.groupId = previous.groupId || previous.id;
           node.name = previous.name;
         } else node.name = `Version ${groupedVersions(target.nodes).length + 1}`;
