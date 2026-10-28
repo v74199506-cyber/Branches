@@ -203,9 +203,10 @@ function render() {
       }
       const changes = differences(tree.nodes.find(n => n.id === node.parent)?.prompt, node.prompt);
       const details = el("details"); details.append(el("summary", changes.length ? `Show changes… (${changes.length})` : "No changes"));
+      const conciseChanges = new Set();
       for (const change of changes) {
         const concise = /CLIP Text Encode|prompt/i.test(change) ? "Prompt text updated" : change;
-        if (![...details.querySelectorAll("p")].some(p => p.textContent === concise)) details.append(el("p", concise));
+        if (!conciseChanges.has(concise)) { conciseChanges.add(concise); details.append(el("p", concise)); }
       }
       details.append(el("p", seeds(node.prompt).map(s => `${s.key} #${s.id}: ${s.value}`).join("\n") || "No numeric seed found"));
       card.append(details);
