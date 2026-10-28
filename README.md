@@ -80,3 +80,8 @@ modify, and redistribute the extension under the terms of that license.
 ## Release
 
 This repository contains the initial public release of Branches. Feature behavior may evolve as ComfyUI's frontend APIs change.
+
+## Documentation
+
+`EVA_ARTICLE_GUIDE.md` contains a publication-ready outline for explaining the
+extension, its branching model, privacy behavior, and practical workflow.

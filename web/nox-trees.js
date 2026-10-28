@@ -9,6 +9,7 @@ let parentCursor = null;
 let branchOrigin = null;
 let historyObserver;
 let orientation = "vertical";
+let historyFilter = "";
 let saveChain = Promise.resolve(), selected = new Set(), expandedVersions = new Set();
 const pending = new Map();
 const resultSelections = new Map();
@@ -166,6 +167,8 @@ function render() {
       const node = version.runs.find(run => run.id === resultSelections.get(version.id)) || version.runs.at(-1);
       const isCurrent = version.runs.some(run => run.id === parentCursor);
       const card = el("article", undefined, `nox-card${isCurrent ? " nox-active" : ""}`);
+      const searchable = `${version.name} ${JSON.stringify(node.prompt)}`.toLowerCase();
+      card.hidden = Boolean(historyFilter && !searchable.includes(historyFilter));
       const heading = el("div", undefined, "nox-node-heading");
       const expanded = expandedVersions.has(node.id);
       const togglePreview = button("", () => { expanded ? expandedVersions.delete(node.id) : expandedVersions.add(node.id); render(); });
@@ -435,6 +438,9 @@ app.registerExtension({
       await app.loadGraphData(copy(tree.draft.workflow)); parentCursor = null; render(); message("Previous edit restored. The next generation starts a new root.");
     }));
     header.append(toolbar);
+    const filter = el("input", undefined, "nox-filter"); filter.type = "search"; filter.placeholder = "Search versions, prompts, or nodes…"; filter.setAttribute("aria-label", "Search history"); filter.value = historyFilter;
+    filter.oninput = () => { historyFilter = filter.value.trim().toLowerCase(); render(); requestAnimationFrame(() => filter.focus()); };
+    header.append(filter);
     const options = el("details", undefined, "nox-options");
     options.append(el("summary", "Tree options"));
     const extraActions = el("div", undefined, "nox-toolbar");
