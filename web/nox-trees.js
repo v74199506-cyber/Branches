@@ -65,9 +65,19 @@ function button(text, fn, primary = false) {
 }
 function save(target = tree) {
   const snapshot = copy(target);
+  // Previews are derived from ComfyUI's /view endpoint. Keep them in memory for
+  // the current session, but omit base64 data from user-data JSON so large trees
+  // stay below the server request limit.
+  for (const node of snapshot.nodes || []) for (const image of node.images || []) delete image.preview;
   message("Saving…");
   const operation = saveChain.catch(() => {}).then(async () => {
-    await api.storeUserData(path(snapshot), snapshot);
+    try { await api.storeUserData(path(snapshot), snapshot); }
+    catch (error) {
+      if (error?.message?.includes("413") || error?.message?.toLowerCase().includes("entity too large")) {
+        throw Error("This tree is too large for ComfyUI storage. Export it as JSON or start a new tree.");
+      }
+      throw error;
+    }
     if (target === tree) message(`Saved to computer · ${new Date().toLocaleTimeString()}`);
   });
   saveChain = operation;
