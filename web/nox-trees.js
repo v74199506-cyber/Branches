@@ -523,7 +523,18 @@ app.registerExtension({
       if (typeof manager?.registerSidebarTab !== "function") return false;
       try { manager.registerSidebarTab(sidebarDefinition); return true; } catch (error) { console.warn("Branches sidebar registration failed", error); return false; }
     };
-    if (!registerSidebar()) [250, 1000, 3000, 6000].forEach(delay => setTimeout(registerSidebar, delay));
+    if (!registerSidebar()) {
+      [250, 1000, 3000, 6000].forEach(delay => setTimeout(registerSidebar, delay));
+      const fallback = button("Branches", () => {
+        panel.hidden = false;
+        panel.classList.add("nox-floating-fallback");
+        if (panel.parentElement !== document.body) document.body.append(panel);
+        render();
+      });
+      fallback.className = "nox-fallback-tab";
+      fallback.setAttribute("aria-label", "Open Branches history");
+      document.body.append(fallback);
+    }
     ready = (async () => {
       const last = localStorage.getItem("nox-trees-last");
       if (last && /^[\da-f-]+$/i.test(last)) {
