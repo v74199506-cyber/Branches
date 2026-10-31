@@ -498,9 +498,7 @@ app.registerExtension({
     const dockObserver = new MutationObserver(attachPanel);
     dockObserver.observe(document.body, { childList: true, subtree: true });
     attachPanel();
-    const registerSidebar = app.extensionManager?.registerSidebarTab;
-    if (typeof registerSidebar === "function") {
-      registerSidebar.call(app.extensionManager, {
+    const sidebarDefinition = {
         id: "nox-branches",
         icon: "icon-[lucide--git-branch]",
         title: "Branches",
@@ -517,8 +515,13 @@ app.registerExtension({
           sidebarMode = false;
           panel.hidden = true;
         },
-      });
-    }
+    };
+    const registerSidebar = () => {
+      const manager = app.extensionManager;
+      if (typeof manager?.registerSidebarTab !== "function") return false;
+      try { manager.registerSidebarTab(sidebarDefinition); return true; } catch (error) { console.warn("Branches sidebar registration failed", error); return false; }
+    };
+    if (!registerSidebar()) [250, 1000, 3000, 6000].forEach(delay => setTimeout(registerSidebar, delay));
     ready = (async () => {
       const last = localStorage.getItem("nox-trees-last");
       if (last && /^[\da-f-]+$/i.test(last)) {
