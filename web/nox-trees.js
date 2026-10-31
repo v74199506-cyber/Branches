@@ -525,6 +525,8 @@ app.registerExtension({
     };
     if (!registerSidebar()) {
       [250, 1000, 3000, 6000].forEach(delay => setTimeout(registerSidebar, delay));
+    }
+    if (!document.querySelector(".nox-fallback-tab")) {
       const fallback = button("Branches", () => {
         panel.hidden = false;
         panel.classList.add("nox-floating-fallback");
