@@ -22,10 +22,10 @@ export function isMinorPromptEdit(before = {}, after = {}) {
       if (creative.test(`${a[key]} ${b[key]}`)) return false;
       const oldWords = a[key].trim().split(/\s+/).filter(Boolean), newWords = b[key].trim().split(/\s+/).filter(Boolean);
       words += Math.max(oldWords.length, newWords.length);
-      changed += oldWords.filter((word, i) => word !== newWords[i]).length + Math.abs(oldWords.length - newWords.length);
+      changed += oldWords.filter(word => !newWords.includes(word)).length + newWords.filter(word => !oldWords.includes(word)).length;
     }
   }
-  return changed > 0 && changed <= 4 && changed / Math.max(words, 1) <= 0.18;
+  return changed > 0 && changed <= 12 && changed / Math.max(words, 1) <= 0.35;
 }
 
 export function startsConfiguredVersion(before = {}, after = {}, rules = {}) {
