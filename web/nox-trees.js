@@ -536,6 +536,7 @@ app.registerExtension({
       fallback.className = "nox-fallback-tab";
       fallback.setAttribute("aria-label", "Open Branches history");
       document.body.append(fallback);
+      console.info("[Branches] fallback button ready");
     }
     ready = (async () => {
       const last = localStorage.getItem("nox-trees-last");
