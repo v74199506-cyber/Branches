@@ -1,6 +1,6 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
-import { copy, newTree, differences, seeds, restoreSeeds, validateTree, branchLanes, configurationKey, groupedVersions, changedText, isMinorPromptEdit } from "./tree-core.mjs";
+import { copy, newTree, differences, seeds, restoreSeeds, validateTree, branchLanes, configurationKey, groupedVersions, changedText, isMinorPromptEdit, startsConfiguredVersion } from "./tree-core.mjs";
 
 const DIR = "nox-trees";
 const path = (tree) => `${DIR}/${tree.id}.json`;
@@ -415,10 +415,25 @@ app.registerExtension({
         const option = el("option", text); option.value = value; option.selected = value === orientation; select.append(option);
       }
       label.append(select); dialog.append(label);
+      dialog.append(el("h3", "Automatic version rules"));
+      dialog.append(el("p", "Choose which changes should start a new creative version. Small wording experiments remain grouped as attempts."));
+      const rules = tree.branchRules || { lora: true, pose: true, clothing: true, environment: true, reference: true };
+      const choices = [
+        ["lora", "A LoRA is added, removed, or changed"],
+        ["pose", "Pose or body position changes"],
+        ["clothing", "Clothing or outfit changes"],
+        ["environment", "Environment, background, or lighting changes"],
+        ["reference", "Reference image or image-conditioning input changes"],
+      ];
+      const ruleInputs = new Map();
+      for (const [key, text] of choices) {
+        const row = el("label"), checkbox = el("input"); checkbox.type = "checkbox"; checkbox.checked = rules[key] !== false; ruleInputs.set(key, checkbox); row.append(checkbox, el("span", text)); dialog.append(row);
+      }
       dialog.append(button("Apply", () => {
         orientation = select.value;
+        tree.branchRules = Object.fromEntries([...ruleInputs].map(([key, input]) => [key, input.checked]));
         localStorage.setItem("nox-trees-orientation", orientation);
-        attachPanel(); setPanelOpen(true); render(); dialog.close();
+        attachPanel(); setPanelOpen(true); render(); void save().catch(() => {}); dialog.close();
       }, true), button("Cancel", () => dialog.close()));
     });
     settings.setAttribute("aria-label", "History settings"); settings.title = "History settings";
@@ -518,7 +533,7 @@ app.registerExtension({
       if (response.prompt_id) {
         node.branchStart = !!parent && origin?.treeId === target.id && origin.parent === parent;
         const previous = target.nodes.find(n => n.id === parent);
-        if (!node.branchStart && previous && (configurationKey(previous.prompt) === configurationKey(node.prompt) || isMinorPromptEdit(previous.prompt, node.prompt))) {
+        if (!node.branchStart && previous && (configurationKey(previous.prompt) === configurationKey(node.prompt) || (isMinorPromptEdit(previous.prompt, node.prompt) && !startsConfiguredVersion(previous.prompt, node.prompt, target.branchRules)))) {
           node.groupId = previous.groupId || previous.id;
           node.name = previous.name;
         } else node.name = `Version ${groupedVersions(target.nodes).length + 1}`;

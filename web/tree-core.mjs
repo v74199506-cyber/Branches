@@ -28,6 +28,29 @@ export function isMinorPromptEdit(before = {}, after = {}) {
   return changed > 0 && changed <= 4 && changed / Math.max(words, 1) <= 0.18;
 }
 
+export function startsConfiguredVersion(before = {}, after = {}, rules = {}) {
+  const textRules = [
+    ["pose", /\b(pose|posing|stance|gesture|sitting|standing|lying|action)\b/i],
+    ["clothing", /\b(outfit|clothes|clothing|dress|shirt|pants|skirt|armor|uniform|衣|服)\b/i],
+    ["environment", /\b(background|environment|scene|room|forest|street|indoor|outdoor|weather|lighting)\b/i],
+  ];
+  for (const [key, pattern] of textRules) if (rules[key]) {
+    for (const id of new Set([...Object.keys(before), ...Object.keys(after)])) {
+      const a = before[id]?.inputs || {}, b = after[id]?.inputs || {};
+      for (const input of new Set([...Object.keys(a), ...Object.keys(b)])) {
+        if (JSON.stringify(a[input]) !== JSON.stringify(b[input]) && pattern.test(`${a[input] ?? ""} ${b[input] ?? ""}`)) return true;
+      }
+    }
+  }
+  for (const id of new Set([...Object.keys(before), ...Object.keys(after)])) {
+    const a = before[id], b = after[id];
+    const type = `${a?.class_type || ""} ${b?.class_type || ""} ${a?._meta?.title || ""} ${b?._meta?.title || ""}`;
+    if (rules.lora && /lora/i.test(type) && JSON.stringify(a?.inputs) !== JSON.stringify(b?.inputs)) return true;
+    if (rules.reference && /load.?image|image.?load|reference|ip.?adapter|controlnet/i.test(type) && JSON.stringify(a?.inputs) !== JSON.stringify(b?.inputs)) return true;
+  }
+  return false;
+}
+
 export function changedText(before, after) {
   let start = 0, end = 0;
   while (start < before.length && start < after.length && before[start] === after[start]) start++;
@@ -60,7 +83,7 @@ export function branchLanes(nodes) {
 }
 
 export function newTree(name = "My tree") {
-  return { schema: 1, id: crypto.randomUUID(), name, created: Date.now(), active: null, seedChoice: "ask", nodes: [] };
+  return { schema: 1, id: crypto.randomUUID(), name, created: Date.now(), active: null, seedChoice: "ask", branchRules: { lora: true, pose: true, clothing: true, environment: true, reference: true }, nodes: [] };
 }
 
 export function differences(before = {}, after = {}) {
