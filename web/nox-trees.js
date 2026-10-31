@@ -380,6 +380,7 @@ app.registerExtension({
     }).catch(error => message(error.message, true));
   },
   async setup() {
+    console.info("[Branches] frontend extension setup");
     orientation = localStorage.getItem("nox-trees-orientation") === "horizontal" ? "horizontal" : "vertical";
     const css = el("link"); css.rel = "stylesheet"; css.href = new URL("./nox-trees.css", import.meta.url).href; document.head.append(css);
     panel = el("aside", undefined, "nox-panel"); panel.setAttribute("aria-label", "Version tree"); panel.hidden = true;
