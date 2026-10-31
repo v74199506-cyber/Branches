@@ -10,6 +10,7 @@ let branchOrigin = null;
 let historyObserver;
 let orientation = "vertical";
 let historyFilter = "";
+let sidebarMode = false;
 let saveChain = Promise.resolve(), selected = new Set(), expandedVersions = new Set();
 const pending = new Map();
 const resultSelections = new Map();
@@ -477,6 +478,7 @@ app.registerExtension({
     const attachPanel = () => {
       panel.classList.toggle("nox-horizontal", orientation === "horizontal");
       if (orientation === "horizontal" && panel.parentElement !== document.body) document.body.append(panel);
+      if (sidebarMode) return;
       const parameters = document.querySelector('#tab-parameters');
       const host = parameters?.closest('[data-testid="properties-panel"]');
       const tabs = parameters?.closest('[role="tablist"]');
@@ -496,6 +498,27 @@ app.registerExtension({
     const dockObserver = new MutationObserver(attachPanel);
     dockObserver.observe(document.body, { childList: true, subtree: true });
     attachPanel();
+    const registerSidebar = app.extensionManager?.registerSidebarTab;
+    if (typeof registerSidebar === "function") {
+      registerSidebar.call(app.extensionManager, {
+        id: "nox-branches",
+        icon: "icon-[lucide--git-branch]",
+        title: "Branches",
+        tooltip: "Generation branches",
+        type: "custom",
+        render(container) {
+          sidebarMode = true;
+          panel.hidden = false;
+          panel.classList.remove("nox-horizontal");
+          container.replaceChildren(panel);
+          render();
+        },
+        destroy() {
+          sidebarMode = false;
+          panel.hidden = true;
+        },
+      });
+    }
     ready = (async () => {
       const last = localStorage.getItem("nox-trees-last");
       if (last && /^[\da-f-]+$/i.test(last)) {
