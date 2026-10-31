@@ -500,8 +500,9 @@ app.registerExtension({
     attachPanel();
     const sidebarDefinition = {
         id: "nox-branches",
-        icon: "icon-[lucide--git-branch]",
+        icon: "pi pi-share-alt",
         title: "Branches",
+        label: "Branches",
         tooltip: "Generation branches",
         type: "custom",
         render(container) {
