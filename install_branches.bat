@@ -25,6 +25,7 @@ if not exist "%COMFY_DIR%\main.py" (
 )
 for %%I in ("%COMFY_DIR%") do set "COMFY_DIR=%%~fI"
 set "TARGET_DIR=%COMFY_DIR%\custom_nodes\Branches"
+if exist "%COMFY_DIR%\custom_nodes\nox-generation-trees" set "TARGET_DIR=%COMFY_DIR%\custom_nodes\nox-generation-trees"
 if not exist "%COMFY_DIR%\custom_nodes" mkdir "%COMFY_DIR%\custom_nodes"
 if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
 echo Installing to "%TARGET_DIR%"...
