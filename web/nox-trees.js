@@ -531,9 +531,10 @@ app.registerExtension({
       const node = { id: crypto.randomUUID(), parent, name: `Version ${target.nodes.length + 1}`, created: Date.now(), workflow: snapshot.workflow, prompt: snapshot.output, images: [], status: "queued", changes: differences(target.nodes.find(n => n.id === parent)?.prompt, snapshot.output) };
       const response = await original.call(this, number, prompt, ...rest);
       if (response.prompt_id) {
-        node.branchStart = !!parent && origin?.treeId === target.id && origin.parent === parent;
         const previous = target.nodes.find(n => n.id === parent);
-        if (!node.branchStart && previous && (configurationKey(previous.prompt) === configurationKey(node.prompt) || (isMinorPromptEdit(previous.prompt, node.prompt) && !startsConfiguredVersion(previous.prompt, node.prompt, target.branchRules)))) {
+        const configuredChange = previous && startsConfiguredVersion(previous.prompt, node.prompt, target.branchRules);
+        node.branchStart = !!parent && (origin?.treeId === target.id && origin.parent === parent || configuredChange);
+        if (!node.branchStart && previous && (configurationKey(previous.prompt) === configurationKey(node.prompt) || (isMinorPromptEdit(previous.prompt, node.prompt) && !configuredChange))) {
           node.groupId = previous.groupId || previous.id;
           node.name = previous.name;
         } else node.name = `Version ${groupedVersions(target.nodes).length + 1}`;
